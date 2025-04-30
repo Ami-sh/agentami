@@ -34,6 +34,12 @@ tools = [
 ]
 
 # Step 3: Create the agent instance
+'''
+if you don't have api keys:
+- get freemium keys
+- switch to a local model 
+- use: from langchain.chat_models.fake import FakeMessagesListLLM
+'''
 agent = AgentAmi(model=ChatOpenAI(model="gpt-4o"),
                  tools=tools,
                  checkpointer=InMemorySaver(),)

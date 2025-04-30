@@ -36,7 +36,7 @@ agent = AgentAmi(
     tool_selector=...,  # Custom function to select relevant tools. Defaults to internal tool_selector.
     top_k=...,  # Number of top tools to use. Defaults to 3.
     context_size=...,  # Number of past user prompts to retain. Defaults to 7.
-    disable_pruner=...,  # If True, disables pruning. May increase token usage. Defaults to False
+    disable_pruner=...,  # If True, disables pruning. Will increase token usage. Defaults to False
     prompt_template=...  # Custom prompt template. Defaults to a generic bot template.
 )
 agent_ami = agent.graph # Your regular langgraph's graph.

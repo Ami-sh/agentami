@@ -1,6 +1,6 @@
-from typing import List, Optional, Callable, Set, Dict
+from typing import List, Optional, Callable, Dict
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import ToolMessage, SystemMessage, BaseMessage
+from langchain_core.messages import SystemMessage, BaseMessage
 from langchain_core.tools import Tool
 from langgraph.graph import StateGraph, START
 from langgraph.graph.state import CompiledStateGraph
@@ -18,7 +18,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 class State(TypedDict):
     """State representing the agent's context, including messages and selected tools."""
     messages: Annotated[List[BaseMessage], add_messages]
-    selected_tools: Set[str]
+    selected_tools: Dict[str, int]
 
 
 class AgentAmi:
@@ -31,40 +31,42 @@ class AgentAmi:
             tools: Optional[List[Tool]] = None,
             checkpointer: Optional[BaseCheckpointSaver] = None,
             tool_selector: Optional[Callable[[str, int], List[str]]] = None,
-            top_k: int = 7,
+            top_k: int = None,
             context_size: Optional[int] = None,
-            disable_pruner: Optional[bool] = False,
-            prompt_template: Optional[str] = "You are a helpful assistant. Use tools if necessary."
+            disable_pruner: Optional[bool] = None,
+            prompt_template: Optional[str] = None
     ):
         """
         Initializes the AgentAmi instance.
 
         Args:
             model (BaseChatModel): The LLM model to be used.
-            tools (Optional[List[Tool]]): A list of tools that the agent can use.
-            checkpointer (Optional[BaseCheckpointSaver]): An optional checkpoint saver.
-            tool_selector (Optional[Callable]): A function to select relevant tools based on the user's input.
+            tools (Optional[List[Tool]]): A list of tools that the agent can use. Defaults to an empty list.
+            checkpointer (Optional[BaseCheckpointSaver]): An optional checkpoint saver. can't retain context without this
+            tool_selector (Optional[Callable]): A function to select relevant tools based on the user's input. Defaults to inbuilt rag.
             top_k (int): The number of tools to select based on relevance. Defaults to 7.
-            context_size (Optional[int]): The maximum number of messages to retain in context.
+            context_size (Optional[int]): The maximum number of user messages to retain in context. Defaults to 3.
             disable_pruner (Optional[bool]): Whether to disable the pruner for tool selection. Defaults to False.
-            prompt_template (Optional[str]): The template to use for the LLM prompt.
+            prompt_template (Optional[str]): The template to use for the LLM prompt. Defaults to a generic assistant prompt.
         """
-        self._validate_init_args(model, tools, checkpointer, tool_selector, top_k, context_size, disable_pruner,
-                                 prompt_template)
+
         self.llm = model
         self.tools = tools or []
         self.checkpointer = checkpointer
-        self.top_k = top_k
-        self.context_size = context_size
+        self.top_k = top_k or 3
+        self.context_size = context_size or 7
         self.tool_registry = {tool.name: tool for tool in self.tools}
-        self.disable_pruner = disable_pruner
+        self.disable_pruner = disable_pruner or False
         self.graph = self._build_agent()
-        self.prompt_template = prompt_template
+        self.prompt_template = prompt_template or "You are a helpful assistant. Use tools if necessary."
         if not tool_selector:
             self._toolkit_retriever = ToolRetriever(tools=self.tools)
             self.tool_selector = self._toolkit_retriever.get_relevant_tools_only
         else:
             self.tool_selector = tool_selector
+        self._validate_init_args(self.llm, self.tools, self.checkpointer, self.tool_selector, self.top_k,
+                                 self.context_size, self.disable_pruner,
+                                 self.prompt_template)
 
     def _agent_node(self) -> Callable[[State], Dict[str, List[BaseMessage]]]:
         """
@@ -87,7 +89,7 @@ class AgentAmi:
 
         return _node
 
-    def _select_relevant_tools_node(self) -> Callable[[State], Dict[str, Set[str]]]:
+    def _select_relevant_tools_node(self) -> Callable[[State], Dict[str, Dict[str, int]]]:
         """
         Returns a LangGraph node that selects relevant tools based on the latest message in the state.
 
@@ -95,13 +97,15 @@ class AgentAmi:
             Callable: A function that selects relevant tools for the agent based on the current state.
         """
 
-        def _node(state: State) -> Dict[str, Set[str]]:
+        def _node(state: State) -> Dict[str, Dict[str, int]]:
             self._state_pruner(state)
             last_message = state["messages"][-1]
             relevant_tools = self.tool_selector(last_message.content, self.top_k)
-            new_tool_set = state.get('selected_tools', set())
-            new_tool_set.update(relevant_tools)
-            return {"selected_tools": new_tool_set}
+            new_tool_dict = state.get('selected_tools', dict())
+            for rank in range(0, len(relevant_tools)):
+                tool = relevant_tools[rank]
+                new_tool_dict[tool] = self.top_k - rank
+            return {"selected_tools": new_tool_dict}
 
         return _node
 
@@ -135,18 +139,10 @@ class AgentAmi:
         Args:
             state (State): The current state to be pruned.
         """
-        if self.disable_pruner or 'selected_tools' not in state:
-            return
-
-        used_tools = set()
-        if self.context_size:
-            state["messages"] = state["messages"][-self.context_size:]
-
-        for message in state["messages"]:
-            if isinstance(message, ToolMessage):
-                used_tools.add(message.name)
-
-        state["selected_tools"] = used_tools
+        if self.disable_pruner: return
+        state["messages"] = state["messages"][-self.context_size:]
+        if 'selected_tools' in state:
+            state['selected_tools'] = dict(list(state['selected_tools'].items())[-(self.top_k * self.context_size):])
 
     @staticmethod
     def context_id(thread_id: str) -> Dict[str, Dict[str, str]]:
@@ -166,7 +162,7 @@ class AgentAmi:
             model: BaseChatModel,
             tools: Optional[List[Tool]],
             checkpointer: Optional[BaseCheckpointSaver],
-            tool_selector: Optional[Callable[[str, int], List[Tool]]],
+            tool_selector: Optional[Callable[[str, int], List[str]]],
             top_k: int,
             context_size: Optional[int],
             disable_pruner: bool,
@@ -179,7 +175,7 @@ class AgentAmi:
             model (BaseChatModel): The language model to use.
             tools (Optional[List[Tool]]): A list of Tool instances.
             checkpointer (Optional[BaseCheckpointSaver]): Checkpoint saving strategy instance.
-            tool_selector (Optional[Callable[[str, int], List[Tool]]]): Callable to select relevant tools.
+            tool_selector (Optional[Callable[[str, int], List[str]]]): Callable to select relevant tools.
             top_k (int): Number of top tools to consider.
             context_size (Optional[int]): Maximum context window size.
             disable_pruner (bool): Flag to disable tool pruning logic.

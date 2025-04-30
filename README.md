@@ -46,7 +46,7 @@ agent_ami = agent.graph # Your regular langgraph's graph.
 
  - Running for the first time **will** take time as it installs the dependencies (models used by internal tool_selector).
  - Your first `agent_ami.invoke() or agent_agent_ami.astream()` may take time if you have hundreds of tools, because it initialises a vector store and embeds the tool descriptions at runtime for each AgentAmi() object
- - Your eventual prompts would be fine.
+ - Your eventual prompts' response time would be fine.
  - Checkout ROADMAP.md file for future features.
 
 ---

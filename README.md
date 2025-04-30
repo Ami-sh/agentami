@@ -57,7 +57,7 @@ def my_own_tool_selector(query: str, top_k: int) -> List[str]:
 
 ## Things you should be aware about: 
 
- - Running for the first time will take time as it installs the dependencies (models used by internal tool_selector).
+ - Running for the first time **will** take time as it installs the dependencies (models used by internal tool_selector).
  - Your first `agent_ami.invoke() or agent_agent_ami.astream()` may take time if you have hundreds of tools, because it initialises a vector store and embeds the tool descriptions at runtime for each AgentAmi() object
  - Your eventual prompts would be fine.
 

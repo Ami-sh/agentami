@@ -5,7 +5,7 @@ to scale with large numbers of tools and intelligently select the most relevant 
 
 It supports:
 
-- Dynamic tool selection via inbuilt (very efficient) RAG with an option to **easily** integrate your own tool_selector.
+- Dynamic tool selection via inbuilt (very efficient) RAG with an option to **easily** replace it with your own tool_selector.
 - Pruner to limit memory and improve performance (it's inbuilt, you don't have to do anything)
 
 ---

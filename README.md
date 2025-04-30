@@ -41,7 +41,7 @@ agent = AgentAmi(
 )
 agent_ami = agent.graph # Your regular langgraph's graph.
 ```
-
+---
 ## How to integrate your own tool selector?
 
 Just make a function that accepts `(query: str, top_k: int)` and parameters and returns `List[str] #List of tool names`.
@@ -55,13 +55,16 @@ def my_own_tool_selector(query: str, top_k: int) -> List[str]:
     # Your logic to select tools based on the query
     return ["tool1", "tool2", "tool3"]  # Return top_k selected tool names
 ```
-
+---
 ## Things you should be aware about: 
 
  - Running for the first time **will** take time as it installs the dependencies (models used by internal tool_selector).
  - Your first `agent_ami.invoke() or agent_agent_ami.astream()` may take time if you have hundreds of tools, because it initialises a vector store and embeds the tool descriptions at runtime for each AgentAmi() object
  - Your eventual prompts would be fine.
+ - Checkout ROADMAP.md file for future features.
 
 <div align="center">
   <img src="AgentAmi.jpeg" alt="AgentAmi" width="300"/>
 </div>
+
+---

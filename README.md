@@ -64,7 +64,7 @@ def my_own_tool_selector(query: str, top_k: int) -> List[str]:
  - Checkout ROADMAP.md file for future features.
 
 <div align="center">
-  <img src="AgentAmi.jpeg" alt="AgentAmi" width="300"/>
+  <img src="AgentAmi.jpg" alt="AgentAmi" width="300"/>
 </div>
 
 ---

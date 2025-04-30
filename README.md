@@ -6,7 +6,7 @@ It helps with decreasing token size **significantly**.
 
 It supports:
 
-- Dynamic tool selection via inbuilt (very efficient) RAG with an option to **easily** replace it with your own tool_selector.
+- Dynamic tool selection via inbuilt runtime RAG (very efficient) with an option to **easily** replace it with your own tool_selector.
 - Pruner to limit context length and improve performance (it's inbuilt, you don't have to do anything).
 
 ---

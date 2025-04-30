@@ -66,5 +66,5 @@ def my_own_tool_selector(query: str, top_k: int) -> List[str]:
  - Your eventual prompts would be fine.
 
 <div align="center">
-  <img src="AgentAmi.png" alt="AgentAmi" width="300"/>
+  <img src="AgentAmi.jpeg" alt="AgentAmi" width="300"/>
 </div>

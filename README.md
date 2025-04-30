@@ -1,12 +1,13 @@
 # AgentAmi
 
 AgentAmi is a flexible agentic framework built using [LangGraph](https://python.langchain.com/docs/langgraph/), designed
-to scale with large numbers of tools and intelligently select the most relevant ones for a given user query.
+to scale with large numbers of tools and intelligently select the most relevant ones for a given user query. 
+It helps with decreasing token size **significantly**.
 
 It supports:
 
 - Dynamic tool selection via inbuilt (very efficient) RAG with an option to **easily** replace it with your own tool_selector.
-- Pruner to limit memory and improve performance (it's inbuilt, you don't have to do anything)
+- Pruner to limit context length and improve performance (it's inbuilt, you don't have to do anything).
 
 ---
 

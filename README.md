@@ -11,15 +11,12 @@ It supports:
 ---
 
 ## Quick start
+> ***Refer the main.py file for a complete sample usage.***
 
-```
+```bash
 pip install agentami
 from agentami import AgentAmi
 ```
-
-## Usage and features
-
-Refer the main.py file for a complete sample usage.
 
 ```python
 from langchain.chat_models import ChatOpenAI

@@ -65,7 +65,8 @@ coverage.xml
 
 # MyPy
 .mypy_cache/
-
+myproject.toml
+setup.py
 # Logs
 *.log
 

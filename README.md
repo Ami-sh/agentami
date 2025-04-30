@@ -14,7 +14,7 @@ It supports:
 ## Quick start
 > ***Refer the main.py file for a complete sample usage.***
 
-```bash
+```zsh
 pip install agentami
 from agentami import AgentAmi
 ```

@@ -65,4 +65,6 @@ def my_own_tool_selector(query: str, top_k: int) -> List[str]:
  - Your first `agent_ami.invoke() or agent_agent_ami.astream()` may take time if you have hundreds of tools, because it initialises a vector store and embeds the tool descriptions at runtime for each AgentAmi() object
  - Your eventual prompts would be fine.
 
-![AgentAmi.png](AgentAmi.png)
+<div align="center">
+  <img src="AgentAmi.png" alt="AgentAmi" width="200"/>
+</div>

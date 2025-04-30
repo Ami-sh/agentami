@@ -32,7 +32,7 @@ agent = AgentAmi(
     checkpointer=InMemorySaver(),  # Optional. No persistence if omitted.
 
     # Optional parameters:
-    tool_selector=...,  # Custom function to select relevant tools. Defaults to internal tool_selector given.
+    tool_selector=...,  # Custom function to select relevant tools. Defaults to internal tool_selector.
     top_k=...,  # Number of top tools to use. Defaults to 3.
     context_size=...,  # Number of past user prompts to retain. Defaults to 7.
     disable_pruner=...,  # If True, disables pruning. May increase token usage. Defaults to False

@@ -12,7 +12,7 @@ It supports:
 ---
 
 ## Quick start
-> ***Refer the main.py file for a complete sample usage.***
+> ***Refer the [main.py](https://github.com/Ami-sh/agentami/blob/main/main.py) file for a complete sample usage.***
 
 ```zsh
 pip install agentami

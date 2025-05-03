@@ -77,6 +77,7 @@ class AgentAmi:
         """
 
         def _node(state: State) -> Dict[str, List[BaseMessage]]:
+            self._state_pruner(state)
             selected_tools = [self.tool_registry[tool_id] for tool_id in state["selected_tools"]]
             llm_with_tools = self.llm.bind_tools(selected_tools)
             prompt = ChatPromptTemplate.from_messages([
@@ -98,7 +99,6 @@ class AgentAmi:
         """
 
         def _node(state: State) -> Dict[str, Dict[str, int]]:
-            self._state_pruner(state)
             last_message = state["messages"][-1]
             relevant_tools = self.tool_selector(last_message.content, self.top_k)
             new_tool_dict = state.get('selected_tools', dict())

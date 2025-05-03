@@ -42,16 +42,19 @@ if you don't have api keys:
 '''
 agent = AgentAmi(model=ChatOpenAI(model="gpt-4o"),
                  tools=tools,
-                 checkpointer=InMemorySaver(),)
+                 checkpointer=InMemorySaver(), )
 
 # Step 4: Compile the LangGraph
 agent_ami = agent.graph
+
 
 # Step 5: Run the agent interactively
 async def run_graph():
     print("AgentAmi is ready. Type your queries. Type 'exit' to quit.")
     config = {"configurable": {"thread_id": "1"}}  # Example thread_id
+    print(agent_ami.get_state(config))
     while True:
+        print(agent_ami.get_state(config))
         prompt = input("\nQuery: ")
         if prompt.lower() in {"exit", "quit"}:
             break
@@ -59,5 +62,6 @@ async def run_graph():
         async for event in agent_ami.astream({"messages": [("human", prompt)]}, stream_mode="updates",
                                              config=config):
             print(event)
+
 
 asyncio.run(run_graph())
